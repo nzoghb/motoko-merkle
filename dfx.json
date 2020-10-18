@@ -1,0 +1,35 @@
+{
+  "canisters": {
+    "SimpleMerkleTree": {
+      "main": "src/Main.mo",
+      "type": "motoko"
+    },
+    "SimpleMerkleTreeTest": {
+      "main": "test/SimpleMerkleTree.mo",
+      "type": "motoko"
+    },
+    "Test": {
+      "main": "test/Main.mo",
+      "type": "motoko"
+    }
+  },
+  "defaults": {
+    "build": {
+      "packtool": "vessel sources"
+    }
+  },
+  "dfx": "0.6.12",
+  "networks": {
+    "local": {
+      "bind": "127.0.0.1:8000",
+      "type": "ephemeral"
+    },
+    "tungsten": {
+      "providers": [
+        "https://gw.dfinity.network"
+      ],
+      "type": "persistent"
+    }
+  },
+  "version": 1
+}
