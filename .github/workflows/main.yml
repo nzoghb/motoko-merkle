@@ -1,0 +1,56 @@
+name: CI
+
+# Controls when the action will run. Triggers the workflow on push or pull request
+# events but only for the main branch
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build_and_test:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2 
+
+      # Runs a single command using the runners shell
+      - name: Sanity check
+        run: echo Hello, world!
+
+      - name: Install dfx
+        run: |
+          wget https://sdk.dfinity.org/install.sh
+          yes Y | DFX_VERSION=$DFX_VERSION sh install.sh
+          echo "/home/runner/bin" >> $GITHUB_PATH
+        env:
+          DFX_VERSION: 0.6.12
+
+      - name: Check installation
+        run: |
+          dfx -v
+
+      - name: Install vessel
+        run: wget --output-document /home/runner/bin/vessel https://github.com/kritzcreek/vessel/releases/download/v$VESSEL_VERSION/vessel-linux64 && chmod +x /home/runner/bin/vessel
+        env:
+          VESSEL_VERSION: 0.5.1
+
+      - name: Start replica, build and deploy canisters
+        run: |
+          dfx start --background
+          dfx canister create --all
+          dfx deploy
+
+      - name: Run tests
+        run: |
+          dfx canister call Test run
+
+      - name: Teardown
+        run: |
+          dfx stop
